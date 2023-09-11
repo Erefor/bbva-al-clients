@@ -26,4 +26,4 @@ COPY --from=build /app/bin/server /app/bin/
 
 
 # Start server.
-CMD ["/app/bin/server"]"]
+CMD ["/app/bin/server"]
