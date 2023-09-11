@@ -1,0 +1,37 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . -t erefor/all-clients --no-cache
+    - name: Log in docker
+      uses: docker/login-action@v2
+      with:
+        username: ${{secrets.DOCKER_HUB_USERNAME}}
+        password: ${{secrets.DOCKER_HUB_PASSWORD}}
+    - name: Push image
+      run: docker push erefor/all-clients
+    - name: Execute ssh commands
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: 137.184.17.154
+        username: bury
+        key: ${{ secrets.BURYDEV_SSH_KEY }}
+        script: | 
+          docker ps
+          docker stop all-clients
+          docker rm all-clients
+          docker pull erefor/all-clients
+          docker run --net=host --name all-clients -d -p 8080:8080 erefor/all-clients
