@@ -34,4 +34,4 @@ jobs:
           docker stop all-clients
           docker rm all-clients
           docker pull erefor/all-clients
-          docker run --net=host1 --name all-clients -d -p 8060:8060 erefor/all-clients
+          docker run --net=host1 --name all-clients -d -p 8090:8080 erefor/all-clients
