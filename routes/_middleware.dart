@@ -10,7 +10,7 @@ Handler middleware(Handler handler) {
     fromShelfMiddleware(
       shelf.corsHeaders(
         headers: {
-          shelf.ACCESS_CONTROL_ALLOW_ORIGIN: 'https://myfrontendurl.com',
+          shelf.ACCESS_CONTROL_ALLOW_ORIGIN: '*',
         },
       ),
     ),
