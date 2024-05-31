@@ -2,7 +2,6 @@
 # Official Dart image: https://hub.docker.com/_/dart
 # Specify the Dart SDK base image version using dart:<version> (ex: dart:2.17)
 FROM dart:stable AS build
-EXPOSE 8060
 
 WORKDIR /app
 
