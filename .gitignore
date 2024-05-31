@@ -4,6 +4,7 @@
 .dart_tool/
 .packages
 pubspec.lock
+.idea
 
 # Files and directories created by dart_frog
 build/

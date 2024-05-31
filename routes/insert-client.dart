@@ -1,57 +1,53 @@
 import 'dart:convert';
 
 import 'package:dart_frog/dart_frog.dart';
-
 import '../sqlConnection.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  // payload: { "tas": String, "clientId": String, "clientPassword": String, "propertyOf": String, "inUseBy": String }
-  final request = context.request;
-  final requestBody = await request.body();
-  final decodeBody = jsonDecode(requestBody);
-  final tas = decodeBody['tas'];
-  final clientId = decodeBody['clientId'];
-  final clientPassword = decodeBody['clientPassword'];
-  final propertyOf = decodeBody['propertyOf'];
-  final inUseBy = decodeBody['inUseBy'];
-
-  if (tas == null || tas == '') {
+  final requestBody = jsonDecode(await context.request.body());
+  bool needData = false;
+  requestBody.forEach((key, value) {
+    if (value == '' || value == null){
+      needData = true;
+    }
+  });
+  if (needData){
     return Response.json(
-        statusCode: 400,
-        body: {'statusCode': 400, 'Error': 'La TAS es requerida'});
+      statusCode: 400,
+      body: {
+      'message': 'Please fill all the fields',
+    },);
   }
 
-  if (clientId == null || clientId == '') {
-    return Response.json(
-        statusCode: 400,
-        body: {'code': 400, 'error': 'El ID del cliente es requerido'});
-  }
-  if (clientPassword == null || clientPassword == '') {
-    return Response.json(
-        statusCode: 400,
-        body: {'code': 400, 'error': 'La contraseña del cliente es requerida'});
-  }
+  final tas = requestBody['tas'];
+  final clientId = requestBody['clientId'];
+  final serial = requestBody['serial'];
+  final account = requestBody['account'];
+  final password = requestBody['password'];
+  final clientType = requestBody['clientType'];
+  final segment = requestBody['segment'];
+  final clientOwner = requestBody['clientOwner'];
+  final useBy = requestBody['useBy'];
+  final readerId = requestBody['readerId'];
+  final phoneNumber = requestBody['phoneNumber'];
+  final phoneNumberOwner = requestBody['phoneNumberOwner'];
 
-  var dbConnection;
   try {
-    dbConnection = await sqlConnection();
+    final connection = await sqlConnection();
+    final statement = await connection.prepare('INSERT INTO Clients (tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    await statement.execute([tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner]);
+    return Response.json(
+      statusCode: 201,
+      body: {
+        'message': 'Client inserted successfully',
+        'extra': 'Pinche chismoso'
+      },);
   } catch (e) {
-    print(e);
     return Response.json(
-        body: {"message": 'No se puede conectar a la DB', "error": e});
+      statusCode: 500,
+      body: {
+      'message': 'An error occurred',
+      'error': e.toString(),
+    },);
   }
-  final tasDbStatement =
-      await dbConnection.prepare('SELECT TAS from Clients where TAS = ?');
-
-  final result = await tasDbStatement.execute([tas]);
-  if (result.rows.toList().isNotEmpty) {
-    return Response.json(
-        statusCode: 400, body: {"message": "The email alredy exist"});
-  }
-  final statement = await dbConnection.prepare(
-      'INSERT INTO Clients (TAS, CLIENT_ID, CLIENT_PASSWORD, PROPERTY_OF, IN_USE_BY) VALUES (?, ?, ?, ?, ?)');
-  await statement.execute([tas, clientId, clientPassword, propertyOf, inUseBy]);
-
-  return Response.json(
-      body: {'message': 'El cliente se ha agregado', 'statusCode': 200});
 }
