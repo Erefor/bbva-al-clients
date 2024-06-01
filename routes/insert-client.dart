@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:mysql_client/mysql_client.dart';
 import '../sqlConnection.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -33,7 +34,8 @@ Future<Response> onRequest(RequestContext context) async {
   final phoneNumberOwner = requestBody['phoneNumberOwner'];
 
   try {
-    final connection = await sqlConnection();
+    final connection = await sqlConnection() as MySQLConnection;
+    print(connection.connected);
     final statement = await connection.prepare('INSERT INTO Clients (tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     await statement.execute([tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner]);
     return Response.json(
