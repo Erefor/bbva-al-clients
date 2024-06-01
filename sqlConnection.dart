@@ -3,7 +3,7 @@ import 'package:mysql_client/mysql_client.dart';
 Future sqlConnection() async {
   try {
     final connection = await MySQLConnection.createConnection(
-        host: 'resto-keys-api-db.burydev.tech',
+        host: 'localhost',
         port: 33060,
         userName: 'root',
         password: 'secret',
