@@ -34,7 +34,7 @@ Future<Response> onRequest(RequestContext context) async {
   final phoneNumberOwner = requestBody['phoneNumberOwner'];
 
   try {
-    final connection = await sqlConnection() as MySQLConnection;
+    final connection = await sqlConnection();
     print(connection.connected);
     final statement = await connection.prepare('INSERT INTO Clients (tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     await statement.execute([tas, clientId, serial, account, password, clientType, segment, clientOwner, useBy, readerId, phoneNumber, phoneNumberOwner]);
